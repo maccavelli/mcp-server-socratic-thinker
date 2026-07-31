@@ -34,8 +34,8 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
-	github.com/maccavelli/mcp-buntdb v0.1.0
-	github.com/maccavelli/mcplib v0.1.0
+	github.com/maccavelli/mcp-buntdb v0.2.0
+	github.com/maccavelli/mcplib v0.2.0
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.20 // indirect
