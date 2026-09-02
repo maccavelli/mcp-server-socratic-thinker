@@ -80,7 +80,20 @@ Windows: irm https://github.com/maccavelli/mcp-server-socratic-thinker/releases/
 }
 
 verify_and_resolve() {
-    line=$(grep -E "  ${PRODUCT}-${OS}-${ARCH}-[0-9]" "$TMP_DIR/SHA256SUMS" | head -n 1) || true
+    # Canonical releases (MADR 0005) list the exact downloaded basename;
+    # pre-canonical releases listed a version-suffixed name while the alias was
+    # downloaded, so only the hash VALUE could be compared. Both are looked up
+    # and a manifest carrying BOTH is ambiguous: preferring either shape would
+    # let an appended line authorize a substituted binary, so it fails closed.
+    canon=$(grep -E "  ${PRODUCT}-${OS}-${ARCH}$" "$TMP_DIR/SHA256SUMS" | head -n 1) || true
+    versioned=$(grep -E "  ${PRODUCT}-${OS}-${ARCH}-[0-9]" "$TMP_DIR/SHA256SUMS" | head -n 1) || true
+    if [ -n "$canon" ] && [ -n "$versioned" ]; then
+        die 2 "ambiguous SHA256SUMS: both a canonical and a versioned entry exist for ${PRODUCT}-${OS}-${ARCH}
+A conforming release lists one shape per manifest. Refusing to choose.
+Nothing was installed."
+    fi
+    line=$canon
+    [ -n "$line" ] || line=$versioned
     [ -n "$line" ] || die 2 "no checksum entry for ${PRODUCT}-${OS}-${ARCH} in SHA256SUMS"
 
     want=$(printf '%s\n' "$line" | awk '{print $1}')
@@ -93,8 +106,14 @@ verify_and_resolve() {
   got      $got
 Nothing was installed."
     fi
-    RESOLVED_VER=${name#"${PRODUCT}-${OS}-${ARCH}-"}
-    RESOLVED_VER=${RESOLVED_VER%.exe}
+    if [ "$name" = "${PRODUCT}-${OS}-${ARCH}" ] || [ "$name" = "${PRODUCT}-${OS}-${ARCH}.exe" ]; then
+        # A canonical entry carries no version in its name; fall back to the
+        # pinned tag rather than inventing one.
+        RESOLVED_VER=${PIN_VERSION:-}
+    else
+        RESOLVED_VER=${name#"${PRODUCT}-${OS}-${ARCH}-"}
+        RESOLVED_VER=${RESOLVED_VER%.exe}
+    fi
     vlog "$PRODUCT verified, version $RESOLVED_VER"
 }
 

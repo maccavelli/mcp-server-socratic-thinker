@@ -24,11 +24,41 @@ A high-performance Model Context Protocol (MCP) sub-server for structured, deep 
 
 ---
 
+## Keeping it up to date
+
+```bash
+mcp-server-socratic-thinker update            # confirm, then install the latest release
+mcp-server-socratic-thinker update --check    # report only; exit 10 if an update is available
+mcp-server-socratic-thinker update --version v1.2.0   # install that exact release
+```
+
+| Flag | Meaning |
+|------|---------|
+| `--check` | Report only. Exit `0` up to date, `10` an actionable target exists, `1` error. Contradicts `--yes` and `--force` |
+| `--yes`, `-y` | Approve without prompting. A non-interactive apply without it fails rather than hanging or replacing silently |
+| `--force` | Replace a locally built binary, or reinstall the selected version. It never bypasses version, asset, size, integrity or target checks |
+| `--version vX.Y.Z` | Install that exact release. A lower tag is reported as an explicit rollback before confirmation |
+
+`update` initializes nothing else — no configuration, config watcher, Recall
+client, metrics store, telemetry, dashboard or MCP server. Set `GH_TOKEN` or
+`GITHUB_TOKEN` to raise GitHub API rate limits; the token is sent only to the
+GitHub API origin.
+
+A binary you built yourself is a **local build** and `update` refuses to replace
+it without `--force`, so a development binary is never silently overwritten. If
+you installed through a package manager, update through that manager instead —
+self-update deliberately does not take ownership of package-manager installs.
+
+Releases are immutable `vMAJOR.MINOR.PATCH` tags publishing the exact
+`mcp-server-socratic-thinker-<goos>-<goarch>[.exe]` assets and one `SHA256SUMS`.
+A rebuilt fix gets a new patch tag rather than replacing a published asset
+(mcplib MADR 0005).
+
 ## Quick Start
 
 ### Step 1: Place the Binary
 
-Download the `mcp-server-socratic-thinker` binary for your platform and place it in a directory on your system `PATH`.
+Download the `mcp-server-socratic-thinker` binary for your platform and place it in a directory on your system `PATH`, or use `scripts/install.sh` (`scripts/install.ps1` on Windows), which verifies the release checksum before installing.
 
 #### Linux
 

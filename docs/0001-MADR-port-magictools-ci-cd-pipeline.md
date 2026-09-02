@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: superseded
 date: 2026-08-29
 decision-makers: Socratic Thinker maintainers
 consulted: mcp-server-magictools CI pipeline as reference implementation
@@ -7,6 +7,27 @@ informed: Socratic Thinker contributors and release consumers
 ---
 
 # Port the hardened magictools CI/CD pipeline to mcp-server-socratic-thinker
+
+## Superseded 2026-09-02 by mcplib MADR 0005
+
+[mcplib MADR 0005](https://github.com/maccavelli/mcplib/blob/main/docs/0005-MADR-canonicalize-cli-self-update-in-mcplib.md)
+canonicalizes CLI self-update across every sibling product, and supersedes this
+record on two points only:
+
+* **Release asset naming.** Release-time version-suffixed copies and the second
+  version-suffixed manifest are gone. A release now publishes the exact
+  `<product>-<goos>-<goarch>[.exe]` basenames and one `SHA256SUMS` over them;
+  the GitHub release already supplies the version namespace.
+* **Mutable publication.** `gh release upload --clobber` and creating a release
+  before its assets are complete are forbidden. Publication goes through
+  mcplib's reusable workflow, which assembles a draft, attests it, publishes it
+  once, and requires the result to be immutable. A rebuilt fix gets a new patch
+  tag.
+
+Everything else in this record stands and was retained: the native test
+strategy, the cgo-off gate, the job timeouts, the action SHA pinning, and the
+binary-only installers with their offline fixtures. The original rationale and
+execution history below are preserved unchanged.
 
 ## Context and Problem Statement
 

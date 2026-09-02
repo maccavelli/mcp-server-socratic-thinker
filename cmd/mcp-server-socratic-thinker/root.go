@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/maccavelli/mcp-server-socratic-thinker/internal/config"
@@ -9,7 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Cfg is the process configuration. It stays nil for commands annotated
+// skipConfigAnnotation, which is how `update` avoids starting a config watcher.
 var Cfg *config.Config
+
+// RealStdout is the process stdout captured before Execute redirects it to
+// stderr, so JSON-RPC output can be written deliberately rather than by
+// accident.
 var RealStdout *os.File
 
 var rootCmd = &cobra.Command{
@@ -23,8 +28,10 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-func Execute() {
+// Execute runs the command tree and returns its error. It no longer calls
+// os.Exit: exit mapping belongs to main, so `update --check` can report an
+// available update as exit 10 instead of a generic failure (MADR 0005).
+func Execute() error {
 	// CRITICAL: Steal os.Stdout to forbid Cobra usage-printing corruption over JSON-RPC
 	RealStdout = os.Stdout
 	os.Stdout = os.Stderr
@@ -32,16 +39,23 @@ func Execute() {
 	rootCmd.SetErr(os.Stderr)
 
 	rootCmd.Version = Version
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal execution error: %v\n", err)
-		os.Exit(1)
-	}
+	return rootCmd.Execute()
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	// cobra.OnInitialize ran initConfig for EVERY command, which would start a
+	// config watcher just to check for an update. A pre-run hook can be scoped
+	// instead: a command annotated selfupdate.skip-config opts out.
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if cmd.Annotations[skipConfigAnnotation] == skipConfigValue {
+			return nil
+		}
+		initConfig()
+		return nil
+	}
 	rootCmd.AddCommand(serveCmd)
 	rootCmd.AddCommand(dashboardCmd)
+	rootCmd.AddCommand(newUpdateCmd())
 }
 
 func initConfig() {
