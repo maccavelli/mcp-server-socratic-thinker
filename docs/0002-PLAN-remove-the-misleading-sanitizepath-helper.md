@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: complete
 date: 2026-09-02
 associated-madr: 0002-MADR-remove-the-misleading-sanitizepath-helper.md
 decision-makers: Socratic Thinker maintainers
@@ -105,4 +105,4 @@ Populate during execution.
 | Baseline caller search | complete | (this commit) | 4 hits in exactly two files at HEAD 067a43820851, matching the plan: `store.go:169-170` and `store_test.go:89-90`. No production caller, so the deletion decision stands | none |
 | Deletion | complete | (this commit) | `SanitizePath` and its doc comment removed from `internal/metrics/store.go`; the single assertion removed from `store_test.go`; `strings` import dropped because the compiler reported it unused, while `path/filepath` was kept since `defaultDBPath` and `Open` still use it (`store.go:58`, `:69`) | the deletion left a trailing blank line that `gofmt -l` flagged; fixed with `gofmt -w` rather than left, and re-verified clean |
 | Verification suite | complete | (this commit) | All ten acceptance checks pass: 0 `SanitizePath` references; gofmt; per-file golint; `go build ./...`; `go vet ./...`; `go test ./internal/metrics`; `go test ./...`; `make lint`; `FormatBytes` coverage retained; `TestStore_TickerAndHelpers` still present. `go build ./...` succeeding is the positive proof that no caller existed | none |
-| Windows CI green | pending | | awaiting the push; this is the criterion the change exists to satisfy | none |
+| Windows CI green | complete | 509945f | Run 33692196259 on 509945f: `Go (windows/amd64)` **success**, alongside darwin/arm64 and linux/amd64. This is the first green Windows run for this repository since the hardened pipeline added the job, and it confirms the separator behaviour that could only be observed on a Windows runner | none |
