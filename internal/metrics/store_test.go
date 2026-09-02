@@ -85,10 +85,6 @@ func TestStore_TickerAndHelpers(t *testing.T) {
 	if FormatBytes(1<<30) != "1.00 GB" {
 		t.Errorf("FormatBytes(1073741824) = %v", FormatBytes(1<<30))
 	}
-
-	if SanitizePath("a/../b") != "a/b" {
-		t.Errorf("SanitizePath = %v", SanitizePath("a/../b"))
-	}
 }
 
 func TestDefaultDBPath(t *testing.T) {

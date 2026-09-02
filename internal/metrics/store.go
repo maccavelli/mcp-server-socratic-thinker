@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/tidwall/buntdb"
@@ -164,9 +163,4 @@ func FormatBytes(b int64) string {
 	default:
 		return strconv.FormatInt(b, 10) + " B"
 	}
-}
-
-// SanitizePath removes any path traversal attempts.
-func SanitizePath(p string) string {
-	return filepath.Clean(strings.ReplaceAll(p, "..", ""))
 }
