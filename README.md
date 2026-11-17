@@ -54,6 +54,14 @@ Releases are immutable `vMAJOR.MINOR.PATCH` tags publishing the exact
 A rebuilt fix gets a new patch tag rather than replacing a published asset
 (mcplib MADR 0005).
 
+Releases v1.1.0 and v1.1.1 were built without the release stamp, so those
+binaries behave as local builds: `update --check` always reports "update
+available" and a plain `update` refuses (0004-MADR). From the next release on,
+release binaries carry the stamp. Once that release is the latest, leave a
+v1.1.0 or v1.1.1 binary by running `mcp-server-socratic-thinker update --force`
+once (it asks before replacing), or by running the installer again; after that
+the binary updates normally.
+
 ## Quick Start
 
 ### Step 1: Place the Binary
